@@ -1,0 +1,102 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar Styles */
+.navbar {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+.navbar-nav .nav-item .nav-link {
+    color: #ffffff !important;
+    transition: color 0.3s ease;
+}
+
+    .navbar-nav .nav-item .nav-link:hover {
+        color: #f8c471 !important;
+    }
+
+/* Main Container */
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Sidebar Styles */
+aside {
+    background: #343a40;
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+    aside h2 {
+        color: #f8c471;
+    }
+
+/* Marquee Animation */
+@keyframes marquee {
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+aside p {
+    display: inline-block;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #f8c471;
+    animation: marquee 8.5s linear infinite;
+}
+
+/* Main Content */
+.main article {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Typography */
+h2 {
+    color: #333;
+    font-weight: bold;
+}
+
+p {
+    font-size: 1rem;
+    color: #555;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    aside {
+        margin-bottom: 20px;
+    }
+}
