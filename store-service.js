@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 let items = [];
 let categories = {};
@@ -26,24 +27,36 @@ function initialize() {
 
 function getAllItems() {
     return new Promise((resolve, reject) => {
-        if (items.length > 0) resolve(items);
-        else reject("No items found");
-    });
+        if (items.length == 0) {
+            reject('no results returned');
+        }
+        else {
+            resolve(items);
+        }
+    })
 }
 
 function getPublishedItems() {
     return new Promise((resolve, reject) => {
         let publishedItems = items.filter(item => item.published === true);
-        if (publishedItems.length > 0) resolve(publishedItems);
-        else reject("No published items found");
-    });
+        if (publisheditems.length == 0) {
+            reject('no results returned');
+        }
+        resolve(items);
+    })
+ 
 }
 
 function getCategories() {
     return new Promise((resolve, reject) => {
-        if (categories.length > 0) resolve(categories);
-        else reject("No categories found");
-    });
+        if (categories.length == 0) {
+            reject('no results returned');
+        }
+        else {
+            resolve(categories);
+        }
+    })
+
 }
 
 module.exports = { initialize, getAllItems, getPublishedItems, getCategories };
