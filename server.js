@@ -42,9 +42,8 @@ storeService.initialize()
         });
 
         // Start the server
-        app.listen(HTTP_PORT, () => console.log(`Server listening on: ${HTTP_PORT}`));
+        module.exports = app; 
     })
     .catch(err => {
         console.log(`Failed to initialize store-service: ${err}`);
     });
-
