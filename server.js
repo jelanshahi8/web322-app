@@ -30,11 +30,7 @@ storeService.initialize()
                 .catch(err => res.status(404).json({ message: err }));
         });
 
-        app.get('/categories', (req, res) => {
-            storeService.getCategories()
-                .then(data => res.json(data))
-                .catch(err => res.status(404).json({ message: err }));
-        });
+        
 
         // 404 Route
         app.use((req, res) => {
