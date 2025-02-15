@@ -1,49 +1,56 @@
-const express = require('express'); // "require" the Express module
-const app = express(); // obtain the "app" object
+
+ const HTTP_PORT = process.env.PORT || 8080;
+const express = require("express");
+const app = express();
 const path = require('path');
-const storeService = require('./store-service');
+const storeservice = require(__dirname + "/store-service.js");
+
+onHttpStart = () => {
+    console.log('Express http server listening on port ' + HTTP_PORT);
+}
 
 app.use(express.static('public'));
-const HTTP_PORT = process.env.PORT || 8080; // assign a port
 
-// Initialize store-service before starting the server
-storeService.initialize()
-    .then(() => {
-        // Define Routes
-        app.get('/', (req, res) => {
-            res.redirect('/about');
-        });
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname + "/views/about.html"));
+});
 
-        app.get('/about', (req, res) => {
-            res.sendFile(path.join(__dirname, '/views/about.html'));
-        });
+ 
+app.get('/home', (req, res) => {
+    res.sendFile(path.join(__dirname + "/views/about.html"));
+});
 
-        app.get('/shop', (req, res) => {
-            storeService.getPublishedItems()
-                .then(data => res.json(data))
-                .catch(err => res.status(404).json({ message: err }));
-        });
 
-        app.get('/items', (req, res) => {
-            storeService.getAllItems()
-                .then(data => res.json(data))
-                .catch(err => res.status(404).json({ message: err }));
-        });
-
-        app.get('/categories', (req, res) => {
-            storeService.getCategories()
-                .then(data => res.json(data))
-                .catch(err => res.status(404).json({ message: err }));
-        });
-
-        // 404 Route
-        app.use((req, res) => {
-            res.status(404).sendFile(path.join(__dirname, '/views/404.html'));
-        });
-
-        // Start the server
-        module.exports = app; 
+app.get("/shop", (req, res) => {
+    storeservice.getPublishedItems().then((data) => {
+        res.json({data});
+    }).catch((err) => {
+        res.status(404).json({message: err});
     })
-    .catch(err => {
-        console.log(`Failed to initialize store-service: ${err}`);
-    });
+});
+
+app.get("/items", (req, res) => {
+    storeservice.getAllItems().then((data) => {
+        res.json({data});
+    }).catch((err) => {
+        res.status(404).json({message: err});
+    })
+});
+
+app.get("/categories", (req, res) => {
+    dataservice.getDepartments().then((data) => {
+        res.json({data});
+    }).catch((err) => {
+        res.status(404).json({message: err});
+    })
+});
+
+app.use((req, res) => {
+    res.status(404).end('404 PAGE NOT FOUND');
+});
+
+dataservice.initialize().then(() => {
+    app.listen(HTTP_PORT, onHttpStart());
+}).catch (() => {
+    console.log('promises unfulfilled');
+});
