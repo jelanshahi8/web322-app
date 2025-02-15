@@ -6,12 +6,21 @@ let categories = [];
 
 function initialize() {
     return new Promise((resolve, reject) => {
-        fs.readFile(path.join(__dirname, 'data/items.json'), 'utf8', (err, data) => {
+        fs.readFile(path.join(__dirname, './data/items.json'), 'utf8', (err, data) => {
             if (err) {
                 reject("Unable to read items.json");
                 return;
             }
             items = JSON.parse(data);
+
+            fs.readFile(path.join(__dirname, './data/categories.json'), 'utf8', (err, data) => {
+                if (err) {
+                    reject("Unable to read categories.json");
+                    return;
+                }
+                categories = JSON.parse(data);
+                
+            });
             resolve();
         });
     });
@@ -34,10 +43,21 @@ function getPublishedItems() {
         if (publishedItems.length == 0) {
             reject('no results returned');
         }
-        resolve(publishedItems);
+        resolve(publisheditems);
     })
  
 }
 
+function getCategories() {
+    return new Promise((resolve, reject) => {
+        if (categories.length == 0) {
+            reject('no results returned');
+        }
+        else {
+            resolve(categories);
+        }
+    })
 
-module.exports = { initialize, getAllItems, getPublishedItems};
+}
+
+module.exports = { initialize, getAllItems, getPublishedItems, getCategories };
