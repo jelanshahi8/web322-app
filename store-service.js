@@ -39,10 +39,10 @@ function getAllItems() {
 function getPublishedItems() {
     return new Promise((resolve, reject) => {
         let publishedItems = items.filter(item => item.published === true);
-        if (publisheditems.length == 0) {
+        if (publishedItems.length == 0) {
             reject('no results returned');
         }
-        resolve(items);
+        resolve(publishedItems);
     })
  
 }
