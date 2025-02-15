@@ -12,15 +12,7 @@ function initialize() {
                 return;
             }
             items = JSON.parse(data);
-
-            fs.readFile(path.join(__dirname, 'data/categories.json'), 'utf8', (err, data) => {
-                if (err) {
-                    reject("Unable to read categories.json");
-                    return;
-                }
-                categories = JSON.parse(data);
-                resolve();
-            });
+            resolve();
         });
     });
 }
@@ -47,16 +39,5 @@ function getPublishedItems() {
  
 }
 
-function getCategories() {
-    return new Promise((resolve, reject) => {
-        if (categories.length == 0) {
-            reject('no results returned');
-        }
-        else {
-            resolve(categories);
-        }
-    })
 
-}
-
-module.exports = { initialize, getAllItems, getPublishedItems, getCategories };
+module.exports = { initialize, getAllItems, getPublishedItems};
