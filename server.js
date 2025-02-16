@@ -31,10 +31,10 @@ storeService.initialize()
         });
 
         app.get('/categories', (req, res) => {
-    storeService.getCategories()
-        .then(data => res.json(data))
-        .catch(err => res.status(404).json({ message: err }));
-      });
+            storeService.getCategories()
+                .then(data => res.json(data))
+                .catch(err => res.status(404).json({ message: err }));
+        });
 
         // 404 Route
         app.use((req, res) => {
@@ -47,3 +47,4 @@ storeService.initialize()
     .catch(err => {
         console.log(`Failed to initialize store-service: ${err}`);
     });
+
