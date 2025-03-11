@@ -60,4 +60,60 @@ function getCategories() {
 
 }
 
-module.exports = { initialize, getAllItems, getPublishedItems, getCategories };
+function addItem(itemData) {
+    return new Promise((resolve, reject) => {
+        if (itemData.published === undefined) {
+            itemData.published = false;
+        }
+        itemData.id = items.length + 1;
+        items.push(itemData);
+
+        fs.writeFile(path.join(__dirname, './data/items.json'), JSON.stringify(items, null, 2), 'utf8', (err) => {
+            if (err) {
+                reject('Failed to save item to file');
+                return;
+            }
+            resolve(itemData);
+        });
+    });
+}
+
+function getItemsByCategory(category) {
+    return new Promise((resolve, reject) => {
+        const filteredItems = items.filter(item => item.category == category);
+        if (filteredItems.length === 0) {
+            reject('no results returned');
+        } else {
+            resolve(filteredItems);
+        }
+    });
+}
+
+function getItemsByMinDate(minDateStr) {
+    return new Promise((resolve, reject) => {
+        const minDate = new Date(minDateStr);
+        if (isNaN(minDate.getTime())) {
+            reject('Invalid date format');
+        }
+        const filteredItems = items.filter(item => new Date(item.postDate) >= minDate);
+        if (filteredItems.length === 0) {
+            reject('no results returned');
+        } else {
+            resolve(filteredItems);
+        }
+    });
+}
+
+function getItemById(id) {
+    return new Promise((resolve, reject) => {
+        const item = items.find(item => item.id == id);
+        if (!item) {
+            reject('no result returned');
+        } else {
+            resolve(item);
+        }
+    });
+}
+
+
+module.exports = { initialize, getAllItems, getPublishedItems, getCategories, addItem, getItemsByCategory, getItemsByMinDate, getItemById };
