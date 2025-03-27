@@ -19,9 +19,8 @@ function initialize() {
                     return;
                 }
                 categories = JSON.parse(data);
-                
+                resolve(); // Moved here to ensure categories are loaded
             });
-            resolve();
         });
     });
 }
@@ -30,11 +29,10 @@ function getAllItems() {
     return new Promise((resolve, reject) => {
         if (items.length == 0) {
             reject('no results returned');
-        }
-        else {
+        } else {
             resolve(items);
         }
-    })
+    });
 }
 
 function getPublishedItems() {
@@ -43,21 +41,18 @@ function getPublishedItems() {
         if (publishedItems.length == 0) {
             reject('no results returned');
         }
-        resolve(publisheditems);
-    })
- 
+        resolve(publishedItems);
+    });
 }
 
 function getCategories() {
     return new Promise((resolve, reject) => {
         if (categories.length == 0) {
             reject('no results returned');
-        }
-        else {
+        } else {
             resolve(categories);
         }
-    })
-
+    });
 }
 
 function addItem(itemData) {
@@ -115,5 +110,15 @@ function getItemById(id) {
     });
 }
 
+function getPublishedItemsByCategory(categoryId) {
+    return new Promise((resolve, reject) => {
+        const publishedItems = items.filter(item => item.category == categoryId && item.published);
+        if (publishedItems.length === 0) {
+            reject('no results returned');
+        } else {
+            resolve(publishedItems);
+        }
+    });
+}
 
-module.exports = { initialize, getAllItems, getPublishedItems, getCategories, addItem, getItemsByCategory, getItemsByMinDate, getItemById };
+module.exports = { initialize, getAllItems, getPublishedItems, getCategories, addItem, getItemsByCategory, getItemsByMinDate, getItemById, getPublishedItemsByCategory };
