@@ -1,81 +1,104 @@
-/*********************************************************************************
-WEB322 – Assignment 02
-I declare that this assignment is my own work in accordance with Seneca Academic Policy.  
-No part of this assignment has been copied manually or electronically from any other source (including 3rd party web sites) or distributed to other students.
-
-Name: jelan shahi
-Student ID: 171378235
-Date: 2025-02-16
-Vercel Web App URL: https://web322-app-eight-tau.vercel.app/about
-GitHub Repository URL: https://github.com/jelanshahi8/web322-app
-
-********************************************************************************/
-
-
-
+const sanitizeHtml = require('sanitize-html');
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const streamifier = require("streamifier");
-const express = require('express'); // "require" the Express module
-const app = express(); // obtain the "app" object
+const express = require('express');
+const app = express();
 const path = require('path');
 const storeService = require('./store-service');
+
+
+
+function sanitize(content) {
+    return sanitizeHtml(content, {
+        allowedTags: [],
+        allowedAttributes: {}
+    });
+}
+
+app.set('view engine', 'ejs');
 
 cloudinary.config({
     cloud_name: "dochsjc0c",
     api_key: "138148657769567",
-    api_secret: "b7xZv1vHyXnZVZbqYeeo13SLqrw",
+    api_secret: "b7xZv1vHyXnZVbqYeeo13SLqrw",
     secure: true
 });
 
-const upload = multer(); 
+const upload = multer();
+
+app.use((req, res, next) => {
+    res.locals.activeRoute = req.path;
+    next();
+});
 
 app.use(express.static('public'));
-const HTTP_PORT = process.env.PORT || 8080; // assign a port
+const HTTP_PORT = process.env.PORT || 8080;
 
-// Initialize store-service before starting the server
 storeService.initialize()
     .then(() => {
-        // Define Routes
         app.get('/', (req, res) => {
             res.redirect('/about');
         });
 
         app.get('/about', (req, res) => {
-            res.sendFile(path.join(__dirname, '/views/about.html'));
+            res.render('about', { pageTitle: 'About' });
         });
 
         app.get('/items/add', (req, res) => {
-            res.sendFile(path.join(__dirname, '/views/addItem.html'));
+            const categories = [
+                { id: 1, name: "Home, Garden" },
+                { id: 2, name: "Electronics, Computers, Video Games" },
+                { id: 3, name: "Clothing" },
+                { id: 4, name: "Sports & Outdoors" },
+                { id: 5, name: "Pets" }
+            ];
+            res.render('addItem', { categories, pageTitle: 'Add Item' });
         });
 
         app.get('/shop', (req, res) => {
-            storeService.getPublishedItems()
-                .then(data => res.json(data))
-                .catch(err => res.status(404).json({ message: err }));
+            Promise.all([
+                storeService.getPublishedItems(),
+                storeService.getCategories()
+            ])
+                .then(([items, categories]) => {
+                    res.render('shop', { items, categories, pageTitle: 'Shop' });
+                })
+                .catch(err => {
+                    res.render('shop', { items: [], categories: [], pageTitle: 'Shop', message: "Error loading items or categories." });
+                });
         });
 
         app.get('/items', (req, res) => {
-            if (req.query.category && req.query.minDate) {
-                return res.status(400).json({ error: "Cannot filter by both category and minDate simultaneously" });
-            }
+            const category = req.query.category;
 
-            if (req.query.category) {
-                storeService.getItemsByCategory(req.query.category)
-                    .then(data => res.json(data))
-                    .catch(err => res.status(404).json({ message: err }));
-            }
-            else if (req.query.minDate) {
-                storeService.getItemsByMinDate(req.query.minDate)
-                    .then(data => res.json(data))
-                    .catch(err => res.status(404).json({ message: err }));
-            }
-            else {
-                storeService.getAllItems()
-                    .then(data => res.json(data))
-                    .catch(err => res.status(404).json({ message: err }));
-            }
+            storeService.getCategories()
+                .then(categories => {
+                    const fetchItems = category
+                        ? storeService.getPublishedItemsByCategory(category)
+                        : storeService.getPublishedItems();
+
+                    return fetchItems.then(items => {
+                        res.render('items', {
+                            items: items,
+                            categories: categories,
+                            message: items.length > 0 ? "" : "No items found",
+                            selectedCategory: category || null,
+                            pageTitle: 'Items'
+                        });
+                    });
+                })
+                .catch(err => {
+                    res.render('items', {
+                        items: [],
+                        categories: [],
+                        message: "Error loading items",
+                        selectedCategory: null,
+                        pageTitle: 'Items'
+                    });
+                });
         });
+
 
         app.get('/item/:value', (req, res) => {
             storeService.getItemById(req.params.value)
@@ -85,11 +108,23 @@ storeService.initialize()
 
         app.get('/categories', (req, res) => {
             storeService.getCategories()
-                .then(data => res.json(data))
-                .catch(err => res.status(404).json({ message: err }));
+                .then((categories) => {
+                    res.render('categories', {
+                        categories: categories,
+                        message: categories.length > 0 ? "" : "No categories found",
+                        pageTitle: 'Categories'
+                    });
+                })
+                .catch((err) => {
+                    res.render('categories', {
+                        categories: [],
+                        message: "Error loading categories",
+                        pageTitle: 'Categories'
+                    });
+                });
         });
 
-        // POST route to handle item addition
+
         app.post('/items/add', upload.single("featureImage"), (req, res) => {
             if (req.file) {
                 let streamUpload = (req) => {
@@ -125,22 +160,18 @@ storeService.initialize()
 
             function processItem(imageUrl) {
                 req.body.featureImage = imageUrl;
-
                 storeService.addItem(req.body)
                     .then(() => res.redirect('/items'))
                     .catch(err => res.status(500).json({ error: err }));
             }
         });
 
-        // 404 Route
         app.use((req, res) => {
             res.status(404).sendFile(path.join(__dirname, '/views/404.html'));
         });
 
-        // Start the server
         app.listen(HTTP_PORT, () => console.log(`Server listening on: ${HTTP_PORT}`));
     })
     .catch(err => {
         console.log(`Failed to initialize store-service: ${err}`);
     });
-
