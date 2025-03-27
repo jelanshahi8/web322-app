@@ -1,0 +1,41 @@
+<%- include('partials/header') %>
+
+<div class="container mt-5">
+    <h1>Shop</h1>
+
+    <!-- Items Section -->
+    <div class="row">
+        <% if (items.length > 0) { %>
+            <% items.forEach(item => { %>
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <img src="<%= item.imageUrl %>" class="card-img-top" alt="<%= item.title %>">
+                        <div class="card-body">
+                            <h5 class="card-title"><%= item.title %></h5>
+                            <p class="card-text">Price: $<%= item.price.toFixed(2) %></p>
+                            <p class="card-text">Date: <%= item.postDate %></p>
+                            <% const matchedCategory = categories.find(cat => cat.id == item.category); %>
+                            <p class="card-text">Category: <%= matchedCategory ? matchedCategory.name : 'Unknown Category' %></p>
+                            <p class="card-text"><%= sanitizeHtml(item.body) %></p>
+                            <a href="/item/<%= item.id %>" class="btn btn-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <p>No items available.</p>
+        <% } %>
+    </div>
+
+    <!-- Sidebar Section with Categories -->
+    <h2>Other Categories</h2>
+    <div class="sidebar">
+        <ul>
+            <% categories.forEach(category => { %>
+                <li><a href="/items?category=<%= category.id %>"><%= category.name %></a></li>
+            <% }); %>
+        </ul>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
