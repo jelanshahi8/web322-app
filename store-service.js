@@ -19,8 +19,9 @@ function initialize() {
                     return;
                 }
                 categories = JSON.parse(data);
-                resolve(); // Moved here to ensure categories are loaded
+                
             });
+            resolve();
         });
     });
 }
@@ -29,10 +30,11 @@ function getAllItems() {
     return new Promise((resolve, reject) => {
         if (items.length == 0) {
             reject('no results returned');
-        } else {
+        }
+        else {
             resolve(items);
         }
-    });
+    })
 }
 
 function getPublishedItems() {
@@ -41,18 +43,21 @@ function getPublishedItems() {
         if (publishedItems.length == 0) {
             reject('no results returned');
         }
-        resolve(publishedItems);
-    });
+        resolve(publisheditems);
+    })
+ 
 }
 
 function getCategories() {
     return new Promise((resolve, reject) => {
         if (categories.length == 0) {
             reject('no results returned');
-        } else {
+        }
+        else {
             resolve(categories);
         }
-    });
+    })
+
 }
 
 function addItem(itemData) {
@@ -109,6 +114,7 @@ function getItemById(id) {
         }
     });
 }
+
 
 function getPublishedItemsByCategory(categoryId) {
     return new Promise((resolve, reject) => {
