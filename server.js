@@ -1,3 +1,4 @@
+
 const sanitizeHtml = require('sanitize-html');
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
@@ -6,6 +7,14 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const storeService = require('./store-service');
+const sequelize = require('./models/db');
+const Category = require('./models/Category');
+const Item = require('./models/Item');
+
+
+sequelize.sync()
+    .then(() => console.log('Database synced successfully'))
+    .catch(err => console.error('Error syncing database:', err));
 
 
 
@@ -17,6 +26,8 @@ function sanitize(content) {
 }
 
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 cloudinary.config({
     cloud_name: "dochsjc0c",
